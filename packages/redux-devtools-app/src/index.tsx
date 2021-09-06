@@ -1,38 +1,39 @@
-import 'devui/lib/presets';
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
+import { Persistor } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
 import configureStore from './store/configureStore';
 import { CONNECT_REQUEST } from './constants/socketActionTypes';
 import App from './containers/App';
 import { StoreState } from './reducers';
-import { ConnectionOptions, StoreAction } from './actions';
+import { StoreAction } from './actions';
 
-interface Props {
-  socketOptions?: ConnectionOptions;
-}
-
-class Root extends Component<Props> {
+class Root extends Component {
   store?: Store<StoreState, StoreAction>;
+  persistor?: Persistor;
 
   UNSAFE_componentWillMount() {
-    configureStore((store, preloadedState) => {
-      this.store = store;
-      store.dispatch({
-        type: CONNECT_REQUEST,
-        options: (preloadedState!.connection ||
-          this.props.socketOptions) as ConnectionOptions,
-      });
-      this.forceUpdate();
-    });
+    const { store, persistor } = configureStore(
+      (store: Store<StoreState, StoreAction>) => {
+        if (store.getState().connection.type !== 'disabled') {
+          store.dispatch({
+            type: CONNECT_REQUEST,
+          });
+        }
+      }
+    );
+    this.store = store;
+    this.persistor = persistor;
   }
 
   render() {
     if (!this.store) return null;
-    const AppAsAny = App as any;
     return (
       <Provider store={this.store}>
-        <AppAsAny {...this.props} />
+        <PersistGate loading={null} persistor={this.persistor!}>
+          <App />
+        </PersistGate>
       </Provider>
     );
   }

@@ -1,6 +1,7 @@
 import React, { PureComponent, Component, ReactElement } from 'react';
 import PropTypes from 'prop-types';
 import ReactSelect, {
+  GroupTypeBase,
   NamedProps as ReactSelectProps,
   OptionTypeBase,
 } from 'react-select';
@@ -8,9 +9,10 @@ import createThemedComponent from '../utils/createThemedComponent';
 import { Theme } from '../themes/default';
 
 export interface SelectProps<
-  Option extends OptionTypeBase = OptionTypeBase,
-  IsMulti extends boolean = false
-> extends Omit<ReactSelectProps<Option, IsMulti>, 'theme'> {
+  Option extends OptionTypeBase,
+  IsMulti extends boolean = false,
+  Group extends GroupTypeBase<Option> = GroupTypeBase<Option>
+> extends Omit<ReactSelectProps<Option, IsMulti, Group>, 'theme'> {
   theme: Theme;
 }
 
@@ -18,16 +20,17 @@ export interface SelectProps<
  * Wrapper around [React Select](https://github.com/JedWatson/react-select).
  */
 export class Select<
-  Option extends OptionTypeBase = OptionTypeBase,
-  IsMulti extends boolean = false
-> extends (PureComponent || Component)<SelectProps<Option, IsMulti>> {
+  Option extends OptionTypeBase,
+  IsMulti extends boolean = false,
+  Group extends GroupTypeBase<Option> = GroupTypeBase<Option>
+> extends (PureComponent || Component)<SelectProps<Option, IsMulti, Group>> {
   render() {
     return (
       <ReactSelect
         {...this.props}
         theme={(theme) => ({
           ...theme,
-          borderRadius: this.props.theme.inputBorderRadius,
+          borderRadius: 0,
           colors: {
             ...theme.colors,
 
@@ -60,9 +63,19 @@ export class Select<
           }),
           control: (base, props) => ({
             ...base,
-            backgroundColor: props.isDisabled
+            backgroundColor: props.isFocused
               ? props.theme.colors.neutral10
               : props.theme.colors.neutral5,
+            borderColor: props.theme.colors.neutral10,
+
+            '&:hover': {
+              backgroundColor: props.theme.colors.neutral10,
+              borderColor: props.theme.colors.neutral10,
+            },
+          }),
+          menu: (base) => ({
+            ...base,
+            zIndex: 10,
           }),
         }}
       />
@@ -82,17 +95,19 @@ export class Select<
 }
 
 export interface ExternalSelectProps<
-  Option extends OptionTypeBase = OptionTypeBase,
-  IsMulti extends boolean = false
-> extends Omit<ReactSelectProps<Option, IsMulti>, 'theme'> {
+  Option extends OptionTypeBase,
+  IsMulti extends boolean = false,
+  Group extends GroupTypeBase<Option> = GroupTypeBase<Option>
+> extends Omit<ReactSelectProps<Option, IsMulti, Group>, 'theme'> {
   theme?: Theme;
 }
 
 type SelectComponent = <
-  Option extends OptionTypeBase = OptionTypeBase,
-  IsMulti extends boolean = false
+  Option extends OptionTypeBase,
+  IsMulti extends boolean = false,
+  Group extends GroupTypeBase<Option> = GroupTypeBase<Option>
 >(
-  props: ExternalSelectProps<Option, IsMulti>
+  props: ExternalSelectProps<Option, IsMulti, Group>
 ) => ReactElement;
 
 export default createThemedComponent(Select) as SelectComponent & {

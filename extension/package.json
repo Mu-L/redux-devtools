@@ -32,6 +32,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
     "@redux-devtools/app": "^1.0.0-8",
     "@redux-devtools/core": "^3.9.0",
     "@redux-devtools/instrument": "^1.11.0",
@@ -40,33 +41,34 @@
     "@redux-devtools/utils": "^1.0.0-6",
     "@types/jsan": "^3.1.2",
     "jsan": "^3.1.13",
+    "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
-    "react-icons": "^3.11.0",
+    "react-icons": "^4.2.0",
     "react-json-tree": "^0.15.0",
-    "react-redux": "^7.2.4",
-    "redux": "^4.1.0"
+    "react-redux": "^7.2.5",
+    "redux": "^4.1.1",
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-decorators": "^7.14.5",
-    "@babel/polyfill": "^7.12.1",
-    "@babel/register": "^7.14.5",
+    "@babel/register": "^7.15.3",
     "bestzip": "^2.2.0",
-    "chromedriver": "^91.0.1",
-    "electron": "^13.1.2",
+    "chromedriver": "^92.0.2",
+    "electron": "^14.0.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
-    "eslint": "^7.28.0",
+    "eslint": "^7.32.0",
     "eslint-config-airbnb": "^18.2.1",
-    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react": "^7.25.1",
     "eslint-plugin-react-hooks": "^4.2.0",
     "gitbook-cli": "^2.3.2",
+    "path-browserify": "^1.0.1",
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",
     "selenium-webdriver": "^3.6.0",
-    "sinon-chrome": "^1.2.0"
+    "sinon-chrome": "^3.0.1"
   }
 }

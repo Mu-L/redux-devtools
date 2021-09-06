@@ -1,6 +1,7 @@
 import path from 'path';
 import webpack from 'webpack';
 import CopyPlugin from 'copy-webpack-plugin';
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
 const extpath = path.join(__dirname, '../src/browser/extension/');
 const mock = `${extpath}chromeAPIMock`;
@@ -34,8 +35,11 @@ const baseConfig = (params) => ({
     ...(params.plugins
       ? params.plugins
       : [
-          new webpack.optimize.ModuleConcatenationPlugin(),
-          new webpack.optimize.OccurrenceOrderPlugin(),
+          new ForkTsCheckerWebpackPlugin({
+            typescript: {
+              configFile: 'tsconfig.json',
+            },
+          }),
         ]),
   ].concat(
     params.copy
@@ -65,6 +69,9 @@ const baseConfig = (params) => ({
       tmp: path.join(__dirname, '../build/tmp'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    fallback: {
+      path: require.resolve('path-browserify'),
+    },
   },
   module: {
     rules: [
@@ -79,7 +86,7 @@ const baseConfig = (params) => ({
           ]),
       {
         test: /\.css?$/,
-        use: ['style-loader', 'raw-loader'],
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.pug$/,

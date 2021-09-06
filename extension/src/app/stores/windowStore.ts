@@ -3,15 +3,15 @@ import {
   compose,
   applyMiddleware,
   Store,
-  PreloadedState,
   StoreEnhancer,
+  Reducer,
 } from 'redux';
+import localForage from 'localforage';
+import { persistReducer, persistStore } from 'redux-persist';
 import exportState from '@redux-devtools/app/lib/middlewares/exportState';
 import api from '@redux-devtools/app/lib/middlewares/api';
 import { CONNECT_REQUEST } from '@redux-devtools/app/lib/constants/socketActionTypes';
-import { StoreState } from '@redux-devtools/app/lib/reducers';
 import {
-  StoreAction,
   StoreActionWithoutUpdateState,
   UpdateStateAction,
 } from '@redux-devtools/app/lib/actions';
@@ -22,12 +22,7 @@ import rootReducer from '../reducers/window';
 import { BackgroundState } from '../reducers/background';
 import { BackgroundAction } from './backgroundStore';
 import { EmptyUpdateStateAction, NAAction } from '../middlewares/api';
-
-export interface TogglePersistAction {
-  readonly type: 'TOGGLE_PERSIST';
-}
-
-export type StoreActionWithTogglePersist = StoreAction | TogglePersistAction;
+import { StoreState } from '@redux-devtools/app/lib/reducers';
 
 export interface ExpandedUpdateStateAction extends UpdateStateAction {
   readonly instances: InstancesState;
@@ -35,15 +30,24 @@ export interface ExpandedUpdateStateAction extends UpdateStateAction {
 
 export type WindowStoreAction =
   | StoreActionWithoutUpdateState
-  | TogglePersistAction
   | ExpandedUpdateStateAction
   | NAAction
   | EmptyUpdateStateAction;
 
+const persistConfig = {
+  key: 'redux-devtools',
+  blacklist: ['instances', 'socket'],
+  storage: localForage,
+};
+
+const persistedReducer: Reducer<StoreState, WindowStoreAction> = persistReducer(
+  persistConfig,
+  rootReducer
+) as any;
+
 export default function configureStore(
   baseStore: Store<BackgroundState, BackgroundAction>,
-  position: string,
-  preloadedState: PreloadedState<StoreState>
+  position: string
 ) {
   let enhancer: StoreEnhancer;
   const middlewares = [exportState, api, syncStores(baseStore)];
@@ -61,19 +65,14 @@ export default function configureStore(
         : (noop: unknown) => noop
     );
   }
-  const store = createStore(rootReducer, preloadedState, enhancer);
-
-  chrome.storage.local.get(['s:hostname', 's:port', 's:secure'], (options) => {
-    if (!options['s:hostname'] || !options['s:port']) return;
-    store.dispatch({
-      type: CONNECT_REQUEST,
-      options: {
-        hostname: options['s:hostname'],
-        port: options['s:port'],
-        secure: options['s:secure'],
-      } as any,
-    });
+  const store = createStore(persistedReducer, enhancer);
+  const persistor = persistStore(store, null, () => {
+    if (store.getState().connection.type !== 'disabled') {
+      store.dispatch({
+        type: CONNECT_REQUEST,
+      });
+    }
   });
 
-  return store;
+  return { store, persistor };
 }

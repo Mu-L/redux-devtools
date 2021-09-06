@@ -31,7 +31,7 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir lib --extensions \".ts\" --source-maps inline",
     "build:umd": "webpack --progress --config webpack.config.umd.ts",
-    "build:umd:min": "webpack --env.production --progress --config webpack.config.umd.ts",
+    "build:umd:min": "webpack --env production --progress --config webpack.config.umd.ts",
     "clean": "rimraf lib dist",
     "test": "jest",
     "lint": "eslint . --ext .ts",
@@ -45,7 +45,7 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.170",
-    "immutable": "^4.0.0-rc.12"
+    "@types/lodash": "^4.14.172",
+    "immutable": "^4.0.0-rc.14"
   }
 }

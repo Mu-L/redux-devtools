@@ -47,6 +47,9 @@ module.exports = (env: { development?: boolean; platform?: string } = {}) => ({
   },
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    fallback: {
+      path: require.resolve('path-browserify'),
+    },
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -62,7 +65,7 @@ module.exports = (env: { development?: boolean; platform?: string } = {}) => ({
     }),
     new ForkTsCheckerWebpackPlugin({
       typescript: {
-        configFile: 'tsconfig.json',
+        configFile: 'tsconfig.demo.json',
       },
     }),
   ],
